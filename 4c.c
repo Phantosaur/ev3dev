@@ -82,9 +82,9 @@ void turnEnc(float angle_deg)
 
     // setMotorSpeed(motorA, 0);
     // setMotorSpeed(motorB, 0);
-    int il1= 50;
-    int il2= -50;
-    if (angle_deg<0){
+    int il1= -50;
+    int il2= 50;
+    if (angle_deg>0){
         il1=-50;
         il2=50;
 
@@ -168,14 +168,15 @@ return 0;
 }
 bool probaRight(){
 float l1;
-turnEnc(-90);
+uint16_t uglL = 90;
+turnEnc(uglL);
 l1=getUSDistance(S2);
 if(l1>=50){
-    turnEnc(90);
+    turnEnc(-uglL);
  return 1;
     
 } else{
-    turnEnc(90);
+    turnEnc(-uglL);
  return 0;
 
 }
@@ -191,13 +192,15 @@ void poisk(float dist)
         delay(50);
     }
 }
-void obr (byte prohod){
-moveEnc(300*prohod);
-turnEnc(-90);
-moveEnc(600);
-turnEnc(-90);
-moveEnc(300*prohod);
-turnEnc(180);
+void obr (uint8_t k){
+    uint16_t l= 300;
+    uint16_t ugl=-90;
+    moveEnc(l*k);
+    turnEnc(ugl);
+    moveEnc(l*2);
+    turnEnc(ugl);
+    moveEnc(l*k);
+    turnEnc(ugl*2);
 
 
 }
@@ -207,49 +210,50 @@ void put3_obr(){
     byte k1;
     byte k2;
     byte k3;
-for (int j=0; j<3;j++){
-for(int i; i<4;i++){
-l = probaLeft();
-if(l==1){
-if  (k1==0){
-k1=i;} else if (k1!=0&& k2==0){
-    k2=i;} else if (k3==0&&k2!=0){
-        k3=0;
+    uint16_t distant = 300;
+    uint16_t uglL = 90;
+    for (uint8_t i; i<4;i++){
+        l=probaLeft();
+        if (l==1){
+            if (k1 == 0 && k2 == 0){
+                k1=i;
+            } else if (k1!=0 && k2==0){
+                k2=i; 
+            } else if (k2!=0 && k3 == 0){
+                k3=i;
+            }
+            turnEnc(uglL);
+            moveEnc(distant*2);
+            turnEnc(uglL);
+            if (k1 !=0 && k2 == 0){
+                moveEnc(distant*k1);
+            } else if (k2 != 0 && k3 == 0){
+                moveEnc(distant*k2);
+            } else if (k3 != 0 && k1 != 0){
+                moveEnc(distant*k3);
+            }
+            turnEnc(uglL*2);
+        }
+        moveEnc(distant);
     }
-turnEnc(90);
-resetMotorEncoder(motorA);
-resetMotorEncoder(motorB);
-moveEnc(600);
-turnEnc(90);
-if (k2==0){moveEnc(300*k1);}else if(k3==0){
-    moveEnc(300*k2);}else if(k3!=0){
-        moveEnc(300*k3);
+    for (uint8_t j; l<4;j++){
+        if (k3 != 0 && k2 != 0 && k1 != 0){
+            obr(k3);
+            k3=0;
+            delay(5000);
+        } else if ( k3 == 0 && k2 != 0 && k1 != 0){
+            obr(k2);
+            k2=0;
+            delay(5000);
+        } else if (k3 == 0 && k2 == 0 && k1 != 0){
+            obr(k1);
+            k1=0;
+            delay(5000);
+        }
     }
-}
-
-turnEnc(-180);
-delay(5000);
-break;
-}
-moveEnc(300);
-}
-for (int i; i<4;i++){
-if (k3!=0){
-obr(k3);
-k3=0;
-delay(5000);
-}else if (k3==0&&k2!=0){
-obr(k2);
-k2=0;
-delay(5000);
-}else if(k2==0&&k3==0){
-    obr(k1);
-    k1=0;
-    delay(5000);
-}
 
 
-}
+
 }
 
 
