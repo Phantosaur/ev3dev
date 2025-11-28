@@ -51,39 +51,11 @@ void stoppoka(float t)
 
 void turnEnc(float angle_deg)
 {
-    //     const float l = ((30 * 3.14) * 1.5) / 360;
-    //     abs(angle_deg);
-    //     int ang = 194.5 * 3.14 / 360 * angle_deg * 2;
 
-    //     resetMotorEncoder(motorA);
-    //     resetMotorEncoder(motorB);
+    int16_t il1 = 50;
+    int16_t il2 = -50;
+    float   k = 1;
 
-    //     setMotorSpeed(motorA, il);
-    //     setMotorSpeed(motorB, il2);
-
-    //     while (getMotorEncoder(motorA) < ang / l)
-    //     {
-    //         delay(20);
-    //         if (getMotorEncoder(motorA) > -getMotorEncoder(motorB))
-    //         {
-    //             il2 += 0.15;
-    //         }
-    //         if (getMotorEncoder(motorA) < -getMotorEncoder(motorB))
-    //         {
-    //             il2 -= 0.15;
-    //         }
-    //         if (getMotorEncoder(motorA) == -getMotorEncoder(motorB))
-    //         {
-
-    //         }
-    //         setMotorSpeed(motorA, il);
-    //         setMotorSpeed(motorB, il2);
-    //     }
-
-    // setMotorSpeed(motorA, 0);
-    // setMotorSpeed(motorB, 0);
-    int il1= -50;
-    int il2= 50;
     if (angle_deg>0){
         il1=-50;
         il2=50;
@@ -94,7 +66,7 @@ void turnEnc(float angle_deg)
     resetMotorEncoder(motorB);
 
     const float l = ((45 * PI) ) / 360;
-    float ang = 190 * PI / 360 * angle_deg;
+    float ang = 190 * PI / 360 * angle_deg*k;
 
     setMotorSpeed(motorA, il1 * sgn(angle_deg));
     setMotorSpeed(motorB, il2 * sgn(angle_deg));
@@ -137,64 +109,35 @@ float moveXY(float x, float y, float ugl)
 
     return ugl;
 }
-void proba()
-{
+
+bool proba(bool napravlenie /*  0 - left, 1 - right  */){
     float l1;
-    float l3;
-
-    turnEnc(-90);
-    delay(20);
-    l3 = getUSDistance(S2);
-    turnEnc(180);
-    delay(20);
-    l1 = getUSDistance(S2);
-    if (l1 > l3)
-    {
-        turnEnc(-180);
-    }
-}
-bool probaLeft(){
-float l1;
-turnEnc(90);
-l1=getUSDistance(S2);
-if(l1>=50){
-    turnEnc(-90);
- return 1;
-
-} else{
-turnEnc(-90);
-return 0;
-}
-}
-bool probaRight(){
-float l1;
-uint16_t uglL = 90;
-turnEnc(uglL);
-l1=getUSDistance(S2);
-if(l1>=50){
-    turnEnc(-uglL);
- return 1;
+    int16_t uglL = 90;
     
-} else{
-    turnEnc(-uglL);
- return 0;
-
-}
-
-}
-void poisk(float dist)
-{
-    while (1)
-    {
-        stoppoka(dist);
-        proba();
-
-        delay(50);
+    uint8_t test_dist = 50;
+    displayTextLine(1,"Ugl: %d", uglL);
+    if (napravlenie==1) {
+        uglL=-uglL;
+        
     }
+    turnEnc(uglL);
+    l1=getUSDistance(S2);
+    displayTextLine(2,"Ugl: %d", uglL);
+    if(l1>=test_dist){
+        turnEnc(-uglL);
+        displayTextLine(3,"Ugl: %d", uglL);
+        return 1;
+    } else{
+        turnEnc(-uglL);
+        displayTextLine(4,"Ugl: %d", uglL);
+        return 0;
+    }
+    delay(500);
 }
+
 void obr (uint8_t k){
     uint16_t l= 300;
-    uint16_t ugl=-90;
+    int16_t ugl=-90;
     moveEnc(l*k);
     turnEnc(ugl);
     moveEnc(l*2);
@@ -204,68 +147,141 @@ void obr (uint8_t k){
 
 
 }
+void ogib (uint8_t k1,uint8_t k2 ){
+    uint16_t dist = 300;
+    int8_t ugl =90;
+    if (k2 == k1) {
+        moveEnc(dist*2);
 
+    } else if (k1 < k2) {
+        turnEnc(ugl);
+        moveEnc(dist*(k2-k1));
+        turnEnc(-ugl);
+        moveEnc(dist*2);
+    } else if (k1 > k2) {
+        turnEnc(-ugl);
+        moveEnc(dist*(k1-k2));
+        turnEnc(ugl);
+        moveEnc(dist*2);
+    }
+
+
+}
 void put3_obr(){
     bool l;
+    bool ugl =0;
     byte k1;
     byte k2;
     byte k3;
     uint16_t distant = 300;
-    uint16_t uglL = 90;
-    for (uint8_t i; i<4;i++){
-        l=probaLeft();
-        if (l==1){
-            if (k1 == 0 && k2 == 0){
-                k1=i;
-            } else if (k1!=0 && k2==0){
-                k2=i; 
-            } else if (k2!=0 && k3 == 0){
-                k3=i;
+    int16_t uglL = 90;
+    uint16_t time_del = 5000;
+    for (uint8_t o = 0; o<3;o++){
+        for (uint8_t i = 0; i<4;i++){
+            l=proba(0);
+            if (l==1){
+                if (o == 0){
+                    k1=i;
+                } else if (o == 1){
+                    k2=i; 
+                } else if (o == 2){
+                    k3=i;
+                }
+                turnEnc(uglL);
+                moveEnc(distant*2);
+                turnEnc(uglL);
+                if (o == 0){
+                    moveEnc(distant*k1);
+                } else if (o == 1){
+                    moveEnc(distant*k2);
+                } else if (o == 2){
+                    moveEnc(distant*k3);
+                }
+                turnEnc(uglL*2);
+                delay(time_del);
+                break;
             }
-            turnEnc(uglL);
-            moveEnc(distant*2);
-            turnEnc(uglL);
-            if (k1 !=0 && k2 == 0){
-                moveEnc(distant*k1);
-            } else if (k2 != 0 && k3 == 0){
-                moveEnc(distant*k2);
-            } else if (k3 != 0 && k1 != 0){
-                moveEnc(distant*k3);
-            }
-            turnEnc(uglL*2);
+            moveEnc(distant);
         }
-        moveEnc(distant);
     }
-    for (uint8_t j; l<4;j++){
-        if (k3 != 0 && k2 != 0 && k1 != 0){
-            obr(k3);
-            k3=0;
-            delay(5000);
-        } else if ( k3 == 0 && k2 != 0 && k1 != 0){
-            obr(k2);
-            k2=0;
-            delay(5000);
-        } else if (k3 == 0 && k2 == 0 && k1 != 0){
-            obr(k1);
-            k1=0;
-            delay(5000);
+    for (uint8_t j = 0; l<3;j++){
+        if (j == 0){
+            //obr(k3);
+            turnEnc(-uglL);
+            ogib(0,k3);
+        } else if (j == 1){
+            //obr(k2);
+            ogib(k3,k2);
+        } else if (j == 2){
+            //obr(k1);
+            ogib(k2,k1);
+            turnEnc(-uglL);
+            moveEnc(distant*k1);
+            turnEnc(2*uglL);
         }
+    delay(time_del);
     }
 
 
 
 }
 
+float l1;
+float lrRed;
+float lrBlue;
+float lrGreen;
+float lrsr;
+bool sysActive = true;
+task sensorReader() {
+    while (sysActive) {
+        delay(20);  // Частота чтения 50 Гц
+        lrRed=(getColorRed(S1)+getColorRed(S3))/2;
+        lrBlue=(getColorBlue(S1)+getColorBlue(S3))/2;
+        lrGreen=(getColorGreen(S1)+getColorGreen(S3))/2;
+        l1=getUSDistance(S2);
+        lrsr=(lrRed+lrBlue+lrGreen)/3;
 
+    }
+}
 
-
+task showInfo() {
+    while (sysActive) {
+        displayTextLine(1, "Red: %.2f", lrRed);
+        displayTextLine(2, "Blue: %.2f", lrBlue);
+        displayTextLine(3, "Green: %.2f", lrGreen);
+        delay(200);  // Обновление экрана 5 раз в секунду
+    }
+}
 
 task main(){
+    startTask(sensorReader);
+    startTask(showInfo);
 
-put3_obr();
+    // Основной поток управления
+    while (true) {
+        while (l1>200)
+        {
+            turnEnc(5);
+            delay(10);
+        }
+        while (lrsr<7)
+        {
+            setMotorSpeed(motorA,0);
+            setMotorSpeed(motorB,0);
+            break;
+        }
+        
+        setMotorSpeed(motorA,50);
+        setMotorSpeed(motorB,50);
 
+        if (getButtonPress(buttonEnter)) {
+            sysActive = false;
+            break;
+        }
+    }
 
 }
+
 
 
 
