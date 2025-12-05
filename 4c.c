@@ -1,5 +1,4 @@
 #include "rbc.h"
-long y = 0;
 
 void moveEnc(float dist)
 {
