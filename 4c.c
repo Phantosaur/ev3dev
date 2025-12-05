@@ -3,11 +3,15 @@ long y = 0;
 
 void moveEnc(float dist)
 {
-
+    
     const float l = ((30 * 3.14) * 1.5) / 360;
+
     float i = 50;
     float i2 = 50;
-
+    if (dist<0){
+        i = -80;
+        i2= -80;
+    }
     resetMotorEncoder(motorA);
     resetMotorEncoder(motorB);
 
@@ -25,11 +29,7 @@ void moveEnc(float dist)
         {
             i2 -= 0.15;
         }
-        if (getMotorEncoder(motorA) == getMotorEncoder(motorB))
-        {
-            i = 50;
-            i2 = 50;
-        }
+
         setMotorSpeed(motorA, i);
         setMotorSpeed(motorB, i2);
     }
@@ -73,24 +73,10 @@ void turnEnc(float angle_deg)
 
     while (fabs(getMotorEncoder(motorA)) < fabs(ang) / l)
     {
-        // delay(20);
-        // if (getMotorEncoder(motorA) > -getMotorEncoder(motorB))
-        // {
-        //     il2 += 0.15;
-        // }
-        // if (getMotorEncoder(motorA) < -getMotorEncoder(motorB))
-        // {
-        //     il2 -= 0.15;
-        // }
 
      setMotorSpeed(motorA,il1);
      setMotorSpeed(motorB,il2);   
-    // }
-    // if (abs(getMotorEncoder(motorA))> abs(getMotorEncoder(motorB))){
-    // while (abs(getMotorEncoder(motorA))> abs(getMotorEncoder(motorB))){
-    
 
-    // }
 
     }
 
@@ -98,17 +84,6 @@ void turnEnc(float angle_deg)
     setMotorSpeed(motorB, 0);
 }
 
-float moveXY(float x, float y, float ugl)
-{
-    float c = sqrt(x * x + y * y);
-
-    float ugl1 = atan2f(y, x) * (180 / PI);
-    ugl = ugl1 - ugl;
-    turnEnc(ugl);
-    moveEnc(c);
-
-    return ugl;
-}
 
 bool proba(bool napravlenie /*  0 - left, 1 - right  */){
     float l1;
@@ -135,18 +110,7 @@ bool proba(bool napravlenie /*  0 - left, 1 - right  */){
     delay(500);
 }
 
-void obr (uint8_t k){
-    uint16_t l= 300;
-    int16_t ugl=-90;
-    moveEnc(l*k);
-    turnEnc(ugl);
-    moveEnc(l*2);
-    turnEnc(ugl);
-    moveEnc(l*k);
-    turnEnc(ugl*2);
 
-
-}
 void ogib (uint8_t k1,uint8_t k2 ){
     uint16_t dist = 300;
     int8_t ugl =90;
@@ -243,7 +207,30 @@ task sensorReader() {
 
     }
 }
+// task dark_lineg(){
+//         while (sysActive)
+//         {
+//             /* code */
+        
+        
+//     if (lrsr<7)
+//     {   
+        
+//         for (uint8_t i; i<250; i++){
+//             setMotorSpeed(motorA,-20);
+//             setMotorSpeed(motorB,-20);
+//         } 
+//             setMotorSpeed(motorA,0);
+//             setMotorSpeed(motorB,0);
 
+
+    
+
+
+        
+//     }
+// }
+//}
 task showInfo() {
     while (sysActive) {
         displayTextLine(1, "Red: %.2f", lrRed);
@@ -253,35 +240,46 @@ task showInfo() {
     }
 }
 
+
 task main(){
     startTask(sensorReader);
     startTask(showInfo);
+    //startTask(dark_lineg);
+    uint8_t i = -80;
+    uint8_t i2 = -80;
 
     // Основной поток управления
-    while (true) {
-        while (l1>200)
-        {
-            turnEnc(5);
-            delay(10);
-        }
-        while (lrsr<7)
-        {
-            setMotorSpeed(motorA,0);
-            setMotorSpeed(motorB,0);
-            break;
+    while (true) 
+    {
+
+        if(lrsr<7){
+            
+        while (lrsr<7){
+            setMotorSpeed(motorA,-60);
+            setMotorSpeed(motorB,-60);
         }
         
-        setMotorSpeed(motorA,50);
-        setMotorSpeed(motorB,50);
+
+    
+        } else if (l1<=50)
+        {
+            setMotorSpeed(motorA,50);
+            setMotorSpeed(motorB,50);            
+
+        } else {
+
+            turnEnc(5);
+
+
+        }
 
         if (getButtonPress(buttonEnter)) {
             sysActive = false;
             break;
         }
+    delay(10);
     }
 
 }
-
-
 
 
