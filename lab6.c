@@ -182,6 +182,6 @@ void put3_obr(){
 
 task main()
 {
- put_3obr();
+ put3_obr();
 
 }
