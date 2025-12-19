@@ -16,7 +16,7 @@ bool l;
 task Sensor_Read() {
     while (sysActiv)
     {
-        lblick = getColorReflected(S4);
+        lblick = getColorReflected(S1);
         rblick = getColorReflected(S3);
         delay(20);
 
