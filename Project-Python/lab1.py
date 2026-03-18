@@ -1,9 +1,11 @@
 #!/usr/bin/env python3 
 from ev3dev2.led import Leds
+from ev3dev2.sound import Sound
 import time
 import random
 
 from ev3dev2.button import Button
+sound=Sound()
 led=Leds() 
 led.all_off() # Turn all LEDs off
 time.sleep(1)
@@ -39,6 +41,9 @@ def no(time1):
     led.set_color("LEFT", "RED")
     time.sleep(time1)
     led.all_off()
+    for i in range(3):
+        sound.play_tone(200,0.4)
+        time.sleep(2)
     led.set_color("RIGHT", "RED")
     led.set_color("LEFT","RED")
     time.sleep(time1)
@@ -48,11 +53,17 @@ def yes(time1):
     led.set_color("LEFT", "GREEN")
     time.sleep(time1)
     led.all_off()
+    for i in range(3):
+        sound.play_tone(2000,0.4)
+        time.sleep(2)
     led.set_color("RIGHT", "GREEN")
     led.set_color("LEFT","GREEN")
     time.sleep(time1)
     led.all_off()
+
 def showbut(butt,time1):
+    if butt != "no" and butt != "yes":
+        sound.play_tone(450,.3)
     if butt =="left":
         left(time1)
     elif butt =="right":
@@ -65,6 +76,7 @@ def showbut(butt,time1):
         yes(time1)
     elif butt =="no":
         no(time1)    
+    time.sleep(2)
 
 
 for  i in range(5):
@@ -78,6 +90,7 @@ for i in range(len(mini_level)):
         if but.up:
             showbut("up",2)
             if mini_level[i] == "up":
+
                 game=1
                 break
             else:
@@ -106,9 +119,13 @@ for i in range(len(mini_level)):
             else:
                 game =-1
     if game == -1:
-        showbut(no)
+        showbut("no",2)
+        sound.speak('Game over !')
         exit()
-        
+if game ==1:
+    showbut("yes",2)
+    sound.speak('You, Winn !')
+    exit()
          
         
 
@@ -121,7 +138,6 @@ for i in range(len(mini_level)):
 # time.sleep(10)
 
         
-
 
 
 
