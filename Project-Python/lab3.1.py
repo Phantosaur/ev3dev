@@ -14,8 +14,8 @@ def turnEnc(angle,speed=50):
         tank_pair.on_for_rotations(speed, -speed, k*angle/2)
 
 angle =-90
-longl =244
-longm =144
+longl =440
+longm =200
 turnEnc(-angle)
 moveEnc(longm)
 turnEnc(-angle)
