@@ -7,7 +7,7 @@ from ev3dev2.display import Display
 lcd = Display()
 tank_pair = MoveTank(OUTPUT_A, OUTPUT_B)
 def moveEnc(long,speed=50):
-    tank_pair.on_for_rotations(speed, speed, long/(math.pi*(3**2)))
+    tank_pair.on_for_rotations(speed, speed, long*2/(math.pi*(3**2)))
 def turnEnc(angle,speed=50):
     k= 1.0/44
     if (angle>0):
@@ -17,7 +17,7 @@ def turnEnc(angle,speed=50):
 def turnEnverse(angle, enverse: bool = False, speed=50):
     if enverse:
         turnEnc(-angle,speed)
-    else :
+    else:
         turnEnc(angle,speed)
 def elmove(long1,long2, storona: bool = False, speed = 50):
     if storona:
@@ -36,13 +36,14 @@ def obezd( storona: bool,speed):
     turnEnverse(angle,storona,speed)
 
 angle =-90
-longl =440
-longm =200
+longl =220
+longm =100
+longob =90
 stor =0
 # turnEnc(angle)
 # moveEnc(longm)
 # turnEnc(-angle)
-# moveEnc(longl)
+# moveEnc(90)
 # turnEnc(-angle)
 # moveEnc(longm)
 # turnEnc(-angle)
@@ -50,14 +51,15 @@ stor =0
 # turnEnc(-2*angle)
 # time.sleep(1)
 
-# turnEnverse(angle,stor)
-# elmove(longm,longl,stor)
-# turnEnverse(-angle,stor)
-# elmove(longl,longm,stor)
-# turnEnverse(-angle,stor)
-# elmove(longm,longl,stor)
-# turnEnverse(-angle,stor)
-# elmove(longl,longm,stor)
-# turnEnverse(-angle,stor)
-# time.sleep(1)
-tank_pair.on_for_rotations(70, 70, (100/(math.pi*(3**2))))
+turnEnverse(angle,stor)
+elmove(longm,longl,stor)
+turnEnverse(-angle,stor)
+elmove(longl,longm,stor)
+turnEnverse(-angle,stor)
+elmove(longm,longl,stor)
+turnEnverse(-angle,stor)
+elmove(longl,longm,stor)
+turnEnverse(-angle,stor)
+time.sleep(1)
+
+
